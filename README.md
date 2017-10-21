@@ -1,6 +1,6 @@
 # microservices
 
-Build docker image based on ubuntu:16.04 with installed mongod, ruby, bundle and deployed [reddit app](https://github.com/Artemmkin/reddit.git)
+Monolith directory contains fiels for build docker image based on ubuntu:16.04 with installed mongod, ruby, bundle and deployed [reddit app](https://github.com/Artemmkin/reddit.git)
 
 For create virtual machine using Google Compute Engine driver use following command:
 `docker-machine create --driver google --google-project {{ project-id }} --google-zone europe-west1-b --google-machine-type f1-micro --google-machine-image $(gcloud compute images list --filter ubuntu-1604-lts --uri) {{ machine-name }}`, replace placeholders to your own.
