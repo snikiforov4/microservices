@@ -1,6 +1,6 @@
 # microservices
 
-## Useful actions
+### Useful commands
 Kill all runned containers:
 `docker kill $(docker ps -q)`
 
@@ -71,3 +71,6 @@ Create and start containers: `docker-compose up -d`
 top and remove containers, networks, images, and volumes: `docker-compose down`
 List containers: `docker-compose ps`
 
+For correct work of Compose define your own [default environment file](https://docs.docker.com/compose/env-file/) **.env**.
+Example of such file **.env.example** placed in the root and contains all needed variables.
+To check yourself use the command: `docker-compose config`
