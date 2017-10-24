@@ -32,8 +32,8 @@ Build images:
 `docker build -t <your-login>/ui:1.0 ./ui`
 
 To connect containers into network it should be created before:
-`docker network create back_net --subnet=10.0.2.0/24`
-`docker network create front_net --subnet=10.0.1.0/24`
+`docker network create backend --subnet=10.0.2.0/24`
+`docker network create frontend --subnet=10.0.1.0/24`
 
 Create volume to store db data:
 `docker volume create reddit_db`
@@ -42,18 +42,18 @@ Before run containers pull the latest mongod image:
 `docker pull mongo:latest`
 
 Run containers:
-`docker run -d --name=mongo_db --net=back_net --net-alias=post_db --net-alias=comment_db -v reddit_db:/data/db mongo:latest`
-`docker run -d --name=post --net=back_net <your-login>/post:1.0`
-`docker run -d --name=comment --net=back_net <your-login>/comment:1.0`
-`docker run -d --name=ui --net=front_net -p 9292:9292 <your-login>/ui:1.0`
+`docker run -d --name=mongo_db --net=backend --net-alias=post_db --net-alias=comment_db -v reddit_db:/data/db mongo:latest`
+`docker run -d --name=post --net=backend <your-login>/post:1.0`
+`docker run -d --name=comment --net=backend <your-login>/comment:1.0`
+`docker run -d --name=ui --net=frontend -p 9292:9292 <your-login>/ui:1.0`
 
 After containers was runned connect them to existing networks:
-`docker network connect front_net post`
-`docker network connect front_net comment` 
+`docker network connect frontend post`
+`docker network connect frontend comment` 
 
- back_net
+ backend
 +--------------------------------+
-|                                |    front_net
+|                                |    frontend
 |  mongo_db  +--------------------------------+
 |            |                   |            |
 |            |   comment   post  |    ui      |

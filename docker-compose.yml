@@ -5,7 +5,7 @@ services:
     volumes:
       - post_db:/data/db
     networks:
-      reddit:
+      backend:
         aliases:
           - post_db
           - comment_db
@@ -15,19 +15,28 @@ services:
     ports:
       - 9292:9292/tcp
     networks:
-      - reddit
+      - frontend
   post:
     build: ./post-py
     image: ${USERNAME}/post:1.0
     networks:
-      - reddit
+      - frontend
+      - backend
   comment:
     build: ./comment
     image: ${USERNAME}/comment:1.0
     networks:
-      - reddit
+      - frontend
+      - backend
 volumes:
   post_db:
 
 networks:
-  reddit:
+  backend:
+    ipam:
+      config:
+        - subnet: 10.0.2.0/24
+  frontend:
+    ipam:
+      config:
+        - subnet: 10.0.1.0/24
