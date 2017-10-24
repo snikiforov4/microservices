@@ -60,3 +60,14 @@ After containers was runned connect them to existing networks:
 +--------------------------------+            |
              |                                |
              +--------------------------------+
+
+
+## Docker compose
+[Doc](https://docs.docker.com/compose/overview/)
+[CLI](https://docs.docker.com/compose/reference/overview/#command-options-overview-and-help)
+
+__Useful commands__:
+Create and start containers: `docker-compose up -d`
+top and remove containers, networks, images, and volumes: `docker-compose down`
+List containers: `docker-compose ps`
+
