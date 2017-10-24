@@ -27,7 +27,8 @@ Monolith directory contains files for building docker image based on ubuntu:16.0
 [Reddit app](https://github.com/Artemmkin/reddit/tree/microservices) divided on services.
 
 Build images:
-```docker build -t <your-login>/post:1.0 ./post-py
+```
+docker build -t <your-login>/post:1.0 ./post-py
 docker build -t <your-login>/comment:1.0 ./comment
 docker build -t <your-login>/ui:1.0 ./ui
 ```
@@ -46,7 +47,8 @@ Before run containers pull the latest mongod image:
 
 Run containers:
 ```
-docker run -d --name=mongo_db --net=backend --net-alias=post_db --net-alias=comment_db -v reddit_db:/data/db mongo:latest
+docker run -d --name=mongo_db --net=backend --net-alias=post_db \
+--net-alias=comment_db -v reddit_db:/data/db mongo:latest
 docker run -d --name=post --net=backend <your-login>/post:1.0
 docker run -d --name=comment --net=backend <your-login>/comment:1.0
 docker run -d --name=ui --net=frontend -p 9292:9292 <your-login>/ui:1.0
@@ -77,9 +79,11 @@ docker network connect frontend comment
 
 __Useful commands__:
 
-> Create and start containers: `docker-compose up -d`
-> Stop and remove containers, networks, images, and volumes: `docker-compose down`
-> List containers: `docker-compose ps`
+Create and start containers: `docker-compose up -d`
+
+Stop and remove containers, networks, images, and volumes: `docker-compose down`
+
+List containers: `docker-compose ps`
 
 For correct work of Compose define your own [default environment file](https://docs.docker.com/compose/env-file/) **.env**.
 Example of such file **.env.example** placed in the root and contains all needed variables.
