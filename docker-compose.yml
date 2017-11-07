@@ -10,21 +10,26 @@ services:
           - post_db
           - comment_db
   ui:
-    build: ./ui
-    image: ${USERNAME}/ui:${UI_IMAGE_VERSION}
+    image: ${USER_NAME}/ui:${UI_IMAGE_VERSION}
     ports:
       - ${UI_PORT}:9292/tcp
     networks:
       - frontend
   post:
-    build: ./post-py
-    image: ${USERNAME}/post:${POST_IMAGE_VERSION}
+    image: ${USER_NAME}/post:${POST_IMAGE_VERSION}
     networks:
       - frontend
       - backend
   comment:
     build: ./comment
-    image: ${USERNAME}/comment:${COMMENT_IMAGE_VERSION}
+    image: ${USER_NAME}/comment:${COMMENT_IMAGE_VERSION}
+    networks:
+      - frontend
+      - backend
+  prometheus:
+    image: ${USER_NAME}/prometheus:${PROMETHEUS_IMAGE_VERSION}
+    ports:
+      - '9090:9090'
     networks:
       - frontend
       - backend
