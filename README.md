@@ -14,6 +14,9 @@ For remove created VM use:
 Check the state of created machines:
 `docker-machine ls`
 
+Show ip of a created VM:
+`docker-machine ip {{ machine-name }}`
+
 __Don't forget__ to set environment variables through command:
 `eval $(docker-machine env {{ machine-name }})`
 
@@ -86,5 +89,15 @@ Stop and remove containers, networks, images, and volumes: `docker-compose down`
 List containers: `docker-compose ps`
 
 For correct work of Compose define your own [default environment file](https://docs.docker.com/compose/env-file/) **.env**.
-Example of such file **.env.example** placed in the root and contains all needed variables.
+Example of such file **.env.example** placed in the root of repo and contains all needed variables.
 To check yourself use the command: `docker-compose config`
+
+## Working with Monitoring
+
+Create the rule to access prometheus:
+`gcloud compute firewall-rules create prometheus-default --allow tcp:9090`
+
+Required options for created VM: `--google-machine-type n1-standard-1`
+
+To run prometheus in container use the following command:
+`docker run --rm -p 9090:9090 -d --name prometheus prom/prometheus`
