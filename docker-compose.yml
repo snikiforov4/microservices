@@ -15,6 +15,7 @@ services:
       - ${UI_PORT}:9292/tcp
     networks:
       - frontend
+      - monitoring
   post:
     image: ${USER_NAME}/post:${POST_IMAGE_VERSION}
     networks:
@@ -26,13 +27,26 @@ services:
     networks:
       - frontend
       - backend
+      - monitoring
   prometheus:
     image: ${USER_NAME}/prometheus:${PROMETHEUS_IMAGE_VERSION}
     ports:
       - '9090:9090'
     networks:
-      - frontend
-      - backend
+      - monitoring
+  node-exporter:
+    image: prom/node-exporter:v0.15.0
+    user: root
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
+    networks:
+      - monitoring
 volumes:
   post_db:
 
@@ -45,3 +59,7 @@ networks:
     ipam:
       config:
         - subnet: ${FRONTEND_SUBNET}
+  monitoring:
+    ipam:
+      config:
+        - subnet: ${MONITORING_SUBNET}
