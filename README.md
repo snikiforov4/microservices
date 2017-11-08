@@ -97,7 +97,5 @@ To check yourself use the command: `docker-compose config`
 Create the rule to access prometheus:
 `gcloud compute firewall-rules create prometheus-default --allow tcp:9090`
 
-Required options for created VM: `--google-machine-type n1-standard-1`
-
 To run prometheus in container use the following command:
 `docker run --rm -p 9090:9090 -d --name prometheus prom/prometheus`
