@@ -9,6 +9,7 @@ services:
         aliases:
           - post_db
           - comment_db
+
   ui:
     image: ${USER_NAME}/ui:${UI_IMAGE_VERSION}
     ports:
@@ -16,11 +17,13 @@ services:
     networks:
       - frontend
       - monitoring
+
   post:
     image: ${USER_NAME}/post:${POST_IMAGE_VERSION}
     networks:
       - frontend
       - backend
+
   comment:
     build: ./comment
     image: ${USER_NAME}/comment:${COMMENT_IMAGE_VERSION}
@@ -28,12 +31,14 @@ services:
       - frontend
       - backend
       - monitoring
+
   prometheus:
     image: ${USER_NAME}/prometheus:${PROMETHEUS_IMAGE_VERSION}
     ports:
       - '9090:9090'
     networks:
       - monitoring
+
   node-exporter:
     image: prom/node-exporter:v0.15.0
     user: root
@@ -47,6 +52,7 @@ services:
       - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
     networks:
       - monitoring
+
   cadvisor:
     image: google/cadvisor:latest
     volumes:
@@ -56,11 +62,26 @@ services:
       - '/var/lib/docker/:/var/lib/docker:ro'
     ports:
       - '8080:8080'
+
+  grafana:
+    image: grafana/grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=secret
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
     networks:
       - monitoring
 
+
 volumes:
   post_db:
+  grafana_data:
+
 
 networks:
   backend:

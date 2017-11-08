@@ -106,8 +106,8 @@ gcloud compute instances add-tags {{ vmname }} --tags http-server
 == cAdvisor ==
 gcloud compute firewall-rules create cadvisor-default --allow tcp:8080
 
-Some UNKNOWN traffic =) (TODO):
-gcloud compute firewall-rules create some-traffic --allow tcp:3000
+== Grafana ==
+gcloud compute firewall-rules create grafana-default --allow tcp:3000
 ```
 
 To run prometheus in container use the following command:
