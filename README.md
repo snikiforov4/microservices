@@ -94,8 +94,21 @@ To check yourself use the command: `docker-compose config`
 
 ## Working with Monitoring
 
-Create the rule to access prometheus:
-`gcloud compute firewall-rules create prometheus-default --allow tcp:9090`
+For properly work of your application __allow__ traffic for the following ports:
+
+```
+== Prometheus ==
+gcloud compute firewall-rules create prometheus-default --allow tcp:9090
+
+== HTTP incoming traffic ==
+gcloud compute instances add-tags {{ vmname }} --tags http-server
+
+== cAdvisor ==
+gcloud compute firewall-rules create cadvisor-default --allow tcp:8080
+
+Some UNKNOWN traffic =) (TODO):
+gcloud compute firewall-rules create some-traffic --allow tcp:3000
+```
 
 To run prometheus in container use the following command:
 `docker run --rm -p 9090:9090 -d --name prometheus prom/prometheus`
