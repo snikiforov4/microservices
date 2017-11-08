@@ -1,1 +1,6 @@
 .env
+
+build_info.txt
+
+## python specific
+*.pyc
