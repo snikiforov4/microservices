@@ -23,6 +23,7 @@ services:
     networks:
       - frontend
       - backend
+      - monitoring
 
   comment:
     build: ./comment
@@ -62,6 +63,8 @@ services:
       - '/var/lib/docker/:/var/lib/docker:ro'
     ports:
       - '8080:8080'
+    networks:
+      - monitoring
 
   grafana:
     image: grafana/grafana
