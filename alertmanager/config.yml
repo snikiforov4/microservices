@@ -1,0 +1,11 @@
+global:
+
+route:
+  receiver: 'slack-notifications'
+
+receivers:
+  - name: 'slack-notifications'
+    slack_configs:
+      - channel: '#sergey-nikiforov'
+        api_url: 'https://hooks.slack.com/services/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'
+        send_resolved: true
