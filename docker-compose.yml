@@ -9,6 +9,7 @@ services:
         aliases:
           - post_db
           - comment_db
+          - mongodb_1
 
   ui:
     image: ${USER_NAME}/ui:${UI_IMAGE_VERSION}
@@ -26,7 +27,6 @@ services:
       - monitoring
 
   comment:
-    build: ./comment
     image: ${USER_NAME}/comment:${COMMENT_IMAGE_VERSION}
     networks:
       - frontend
@@ -52,6 +52,14 @@ services:
       - '--path.sysfs=/host/sys'
       - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
     networks:
+      - monitoring
+
+  mongodb-exporter:
+    image: eses/mongodb_exporter
+    environment:
+      - MONGODB_URL=mongodb://mongodb_1:27017
+    networks:
+      - backend
       - monitoring
 
   cadvisor:
