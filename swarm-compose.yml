@@ -1,0 +1,80 @@
+version: '3.3'
+services:
+  mongo_db:
+    image: mongo:${MONGO_IMAGE_VERSION}
+    volumes:
+      - mongo_db:/data/db
+    networks:
+      backend:
+        aliases:
+          - post_db
+          - comment_db
+    deploy:
+      placement:
+        constraints:
+          - node.labels.reliability == high
+
+  ui:
+    image: ${USER_NAME}/ui:${UI_IMAGE_VERSION}
+    ports:
+      - ${UI_PORT}:9292/tcp
+    networks:
+      - frontend
+    deploy:
+      mode: replicated
+      replicas: 3
+      placement:
+        constraints:
+          - node.role == worker
+
+  post:
+    image: ${USER_NAME}/post:${POST_IMAGE_VERSION}
+    networks:
+      - frontend
+      - backend
+    deploy:
+      mode: replicated
+      replicas: 3
+      placement:
+        constraints:
+          - node.role == worker
+
+  comment:
+    image: ${USER_NAME}/comment:${COMMENT_IMAGE_VERSION}
+    networks:
+      - frontend
+      - backend
+    deploy:
+      mode: replicated
+      replicas: 3
+      placement:
+        constraints:
+          - node.role == worker
+
+  node-exporter:
+    image: prom/node-exporter:v0.15.0
+    user: root
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
+    deploy:
+      mode: global
+
+volumes:
+  mongo_db:
+
+
+networks:
+  backend:
+    ipam:
+      config:
+        - subnet: ${BACKEND_SUBNET}
+  frontend:
+    ipam:
+      config:
+        - subnet: ${FRONTEND_SUBNET}

@@ -3,7 +3,7 @@ services:
   mongo_db:
     image: mongo:${MONGO_IMAGE_VERSION}
     volumes:
-      - post_db:/data/db
+      - mongo_db:/data/db
     networks:
       backend:
         aliases:
@@ -99,7 +99,7 @@ services:
 
 
 volumes:
-  post_db:
+  mongo_db:
   grafana_data:
 
 
