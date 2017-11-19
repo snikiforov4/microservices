@@ -10,6 +10,10 @@ services:
           - post_db
           - comment_db
           - mongodb_1
+    deploy:
+      placement:
+        constraints:
+          - node.labels.reliability == high
 
   ui:
     image: ${USER_NAME}/ui:${UI_IMAGE_VERSION}
@@ -18,6 +22,26 @@ services:
     networks:
       - frontend
       - monitoring
+    environment:
+      - ENV=${ENV}
+    deploy:
+      mode: replicated
+      replicas: 3
+      placement:
+        constraints:
+          - node.role == worker
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 3s
+      update_config:
+        parallelism: 1
+        delay: 5s
+        failure_action: rollback
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 150M
 
   post:
     image: ${USER_NAME}/post:${POST_IMAGE_VERSION}
@@ -25,6 +49,24 @@ services:
       - frontend
       - backend
       - monitoring
+    deploy:
+      mode: replicated
+      replicas: 3
+      placement:
+        constraints:
+          - node.role == worker
+      restart_policy:
+        condition: on-failure
+        max_attempts: 10
+        delay: 1s
+      update_config:
+        parallelism: 2
+        delay: 10s
+        failure_action: rollback
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 300M
 
   comment:
     image: ${USER_NAME}/comment:${COMMENT_IMAGE_VERSION}
@@ -32,87 +74,21 @@ services:
       - frontend
       - backend
       - monitoring
-
-  prometheus:
-    image: ${USER_NAME}/prometheus:${PROMETHEUS_IMAGE_VERSION}
-    ports:
-      - '9090:9090'
-    networks:
-      - monitoring
-
-  node-exporter:
-    image: prom/node-exporter:v0.15.0
-    user: root
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
-    networks:
-      - monitoring
-
-  mongodb-exporter:
-    image: eses/mongodb_exporter
-    environment:
-      - MONGODB_URL=mongodb://mongodb_1:27017
-    networks:
-      - backend
-      - monitoring
-
-  cadvisor:
-    image: google/cadvisor:latest
-    volumes:
-      - '/:/rootfs:ro'
-      - '/var/run:/var/run:rw'
-      - '/sys:/sys:ro'
-      - '/var/lib/docker/:/var/lib/docker:ro'
-    ports:
-      - '8080:8080'
-    networks:
-      - monitoring
-
-  grafana:
-    image: grafana/grafana
-    volumes:
-      - grafana_data:/var/lib/grafana
-    environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=secret
-    depends_on:
-      - prometheus
-    ports:
-      - 3000:3000
-    networks:
-      - monitoring
-
-  alertmanager:
-    image: ${USER_NAME}/alertmanager
-    command:
-      - '-config.file=/etc/alertmanager/config.yml'
-    ports:
-      - 9093:9093
-    networks:
-      - monitoring
-
-
-volumes:
-  mongo_db:
-  grafana_data:
-
-
-networks:
-  backend:
-    ipam:
-      config:
-        - subnet: ${BACKEND_SUBNET}
-  frontend:
-    ipam:
-      config:
-        - subnet: ${FRONTEND_SUBNET}
-  monitoring:
-    ipam:
-      config:
-        - subnet: ${MONITORING_SUBNET}
+    deploy:
+      mode: replicated
+      replicas: 3
+      placement:
+        constraints:
+          - node.role == worker
+      restart_policy:
+        condition: on-failure
+        max_attempts: 10
+        delay: 1s
+      update_config:
+        parallelism: 2
+        delay: 10s
+        failure_action: rollback
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 300M
