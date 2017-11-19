@@ -32,6 +32,10 @@ services:
         parallelism: 1
         delay: 5s
         failure_action: rollback
+      resources:
+        limits:
+          cpus: ‘0.25’
+          memory: 150M
 
   post:
     image: ${USER_NAME}/post:${POST_IMAGE_VERSION}
@@ -48,6 +52,10 @@ services:
         parallelism: 2
         delay: 10s
         failure_action: rollback
+      resources:
+        limits:
+          cpus: ‘0.3’
+          memory: 300M
 
   comment:
     image: ${USER_NAME}/comment:${COMMENT_IMAGE_VERSION}
@@ -64,6 +72,10 @@ services:
         parallelism: 2
         delay: 10s
         failure_action: rollback
+      resources:
+        limits:
+          cpus: ‘0.3’
+          memory: 300M
 
   node-exporter:
     image: prom/node-exporter:v0.15.0
