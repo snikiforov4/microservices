@@ -28,6 +28,10 @@ services:
       placement:
         constraints:
           - node.role == worker
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 3s
       update_config:
         parallelism: 1
         delay: 5s
@@ -48,6 +52,10 @@ services:
       placement:
         constraints:
           - node.role == worker
+      restart_policy:
+        condition: on-failure
+        max_attempts: 10
+        delay: 1s
       update_config:
         parallelism: 2
         delay: 10s
@@ -68,6 +76,10 @@ services:
       placement:
         constraints:
           - node.role == worker
+      restart_policy:
+        condition: on-failure
+        max_attempts: 10
+        delay: 1s
       update_config:
         parallelism: 2
         delay: 10s
