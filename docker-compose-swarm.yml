@@ -20,12 +20,18 @@ services:
       - ${UI_PORT}:9292/tcp
     networks:
       - frontend
+    environment:
+      - ENV=${ENV}
     deploy:
       mode: replicated
       replicas: 3
       placement:
         constraints:
           - node.role == worker
+      update_config:
+        parallelism: 1
+        delay: 5s
+        failure_action: rollback
 
   post:
     image: ${USER_NAME}/post:${POST_IMAGE_VERSION}
@@ -38,6 +44,10 @@ services:
       placement:
         constraints:
           - node.role == worker
+      update_config:
+        parallelism: 2
+        delay: 10s
+        failure_action: rollback
 
   comment:
     image: ${USER_NAME}/comment:${COMMENT_IMAGE_VERSION}
@@ -50,6 +60,10 @@ services:
       placement:
         constraints:
           - node.role == worker
+      update_config:
+        parallelism: 2
+        delay: 10s
+        failure_action: rollback
 
   node-exporter:
     image: prom/node-exporter:v0.15.0
