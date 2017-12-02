@@ -3,7 +3,7 @@ services:
   prometheus:
     image: ${USER_NAME}/prometheus:${PROMETHEUS_IMAGE_VERSION}
     ports:
-      - '9090:9090'
+      - '${PROMETHEUS_PUBLISHED_PORT}:9090'
     networks:
       - monitoring
     deploy:
@@ -59,7 +59,7 @@ services:
       - '/sys:/sys:ro'
       - '/var/lib/docker/:/var/lib/docker:ro'
     ports:
-      - '8080:8080'
+      - '${CADVISOR_PUBLISHED_PORT}:8080'
     networks:
       - monitoring
     deploy:
@@ -81,7 +81,7 @@ services:
     depends_on:
       - prometheus
     ports:
-      - 3000:3000
+      - '${GRAFANA_PUBLISHED_PORT}:3000'
     networks:
       - monitoring
     deploy:
@@ -98,7 +98,7 @@ services:
     command:
       - '-config.file=/etc/alertmanager/config.yml'
     ports:
-      - 9093:9093
+      - '${ALERTMANAGER_PUBLISHED_PORT}:9093'
     networks:
       - monitoring
     deploy:

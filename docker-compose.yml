@@ -18,7 +18,7 @@ services:
   ui:
     image: ${USER_NAME}/ui:${UI_IMAGE_VERSION}
     ports:
-      - ${UI_PORT}:9292/tcp
+      - ${UI_PUBLISHED_PORT}:9292/tcp
     networks:
       - frontend
       - monitoring
