@@ -4,3 +4,8 @@ build_info.txt
 
 ## python specific
 *.pyc
+
+# Config file for dynanic inventory contains sensitive information
+gce.ini
+
+*.retry

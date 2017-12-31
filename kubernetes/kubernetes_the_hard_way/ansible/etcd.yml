@@ -1,0 +1,87 @@
+- name: Bootstrapping the etcd
+  hosts: tag_controller
+  gather_facts: false
+  vars:
+    deploy_user: appuser
+
+  pre_tasks:
+    - name: Install python for Ansible
+      raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+      changed_when: false
+    - setup:
+       gather_subset: all
+
+  tasks:
+    - name: Download and unzip etcd release binaries
+      unarchive:
+        src: https://github.com/coreos/etcd/releases/download/v3.2.11/etcd-v3.2.11-linux-amd64.tar.gz
+        dest: /home/{{ deploy_user }}
+        remote_src: yes
+      tags:
+        - install
+
+    - name: Install etcd
+      copy:
+        src: "{{ item }}"
+        dest: /usr/local/bin/
+        remote_src: yes
+        owner: "{{ deploy_user }}"
+        mode: 0755
+      with_items:
+        - "/home/{{ deploy_user }}/etcd-v3.2.11-linux-amd64/etcd"
+        - "/home/{{ deploy_user }}/etcd-v3.2.11-linux-amd64/etcdctl"
+      become: true
+      tags:
+        - install
+
+    - name: Clean after install etcd
+      file:
+        state: absent
+        path: "/home/{{ deploy_user }}/etcd-v3.2.11-linux-amd64"
+      tags:
+        - install
+
+    - name: Configure etcd. Create directories
+      file:
+        path: /etc/etcd
+        owner: "{{ deploy_user }}"
+        state: directory
+      become: true
+      tags:
+        - configure
+
+    - name: Configure etcd. Copy configs
+      copy:
+        src: "{{ item }}"
+        dest: /etc/etcd/
+        owner: "{{ deploy_user }}"
+        mode: 0744
+      with_items:
+        - "../ca.pem"
+        - "../kubernetes.pem"
+        - "../kubernetes-key.pem"
+      become: true
+      tags:
+        - configure
+
+    - name: Create systemd unit
+      template:
+        src: templates/etcd.service.j2
+        dest: /etc/systemd/system/etcd.service
+        owner: "{{ deploy_user }}"
+        mode: 0744
+      become: true
+      tags:
+        - systemd
+      notify:
+        - reload etcd
+
+
+  handlers:
+    - name: reload etcd
+      become: true
+      systemd: 
+        name: etcd
+        state: restarted
+        enabled: yes
+        daemon_reload: yes
