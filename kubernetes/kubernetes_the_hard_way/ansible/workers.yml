@@ -1,0 +1,166 @@
+- name: Bootstrapping the Kubernetes Worker Nodes
+  hosts: tag_worker
+  gather_facts: false
+  vars:
+    deploy_user: appuser
+
+  pre_tasks:
+    - name: Install python for Ansible
+      raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+      changed_when: false
+    - setup:
+       gather_subset: all
+
+  tasks:
+    - name: Update repositories cache and install "socat" package
+      apt:
+        name: socat
+        update_cache: yes
+      become: true
+      tags:
+        - install
+        - kubectl
+
+    - name: Create the installation directories
+      file:
+        state: directory
+        path: "{{ item }}"
+      become: true
+      with_items:
+        - /etc/cni/net.d/
+        - /opt/cni/bin/
+        - /var/lib/kubelet/
+        - /var/lib/kube-proxy/
+        - /var/lib/kubernetes/
+        - /var/run/kubernetes/
+      tags:
+        - install
+        - cni
+        - containerd
+        - kubelet
+        - kubeproxy
+        - kubectl
+
+    - name: Download and install cli-containerd
+      unarchive:
+        src: https://github.com/kubernetes-incubator/cri-containerd/releases/download/v1.0.0-beta.0/cri-containerd-1.0.0-beta.0.linux-amd64.tar.gz
+        dest: /
+        extra_opts: [--strip-components=1]
+        remote_src: yes
+      become: true
+      tags:
+        - install
+        - containerd
+
+    - name: Download and install cni binaries
+      unarchive:
+        src: https://github.com/containernetworking/plugins/releases/download/v0.6.0/cni-plugins-amd64-v0.6.0.tgz
+        dest: /opt/cni/bin/
+        remote_src: yes
+      become: true
+      tags:
+        - install
+        - cni
+
+    - name: Download and Install the kubelet, kube-proxy, kubectl
+      get_url:
+        url: "{{ item }}"
+        dest: /usr/local/bin/
+        mode: 0755
+      become: true
+      with_items:
+        - https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl
+        - https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-proxy
+        - https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubelet
+      tags:
+        - install
+        - kubectl
+        - kubeproxy
+        - kubelet
+    
+    - name: Configure CNI Networking
+      template:
+        src: "templates/{{ item }}.j2"
+        dest: "/etc/cni/net.d/{{ item }}"
+        mode: 0744
+      become: true
+      with_items:
+        - 10-bridge.conf
+        - 99-loopback.conf
+      tags:
+        - configure
+        - cni
+
+    - name: Configure the Kubelet. Copy keys
+      copy:
+        src: "{{ item }}"
+        dest: /var/lib/kubelet/
+        mode: 0744
+      become: true
+      with_items:
+        - "../{{ hostvars[inventory_hostname].gce_name }}.pem"
+        - "../{{ hostvars[inventory_hostname].gce_name }}-key.pem"
+      tags:
+        - configure
+        - kubelet
+
+    - name: Configure the Kubelet. Copy kubeconfig
+      copy:
+        src: "../{{ hostvars[inventory_hostname].gce_name }}.kubeconfig"
+        dest: /var/lib/kubelet/kubeconfig
+        mode: 0744
+      become: true
+      tags:
+        - configure
+        - kubelet
+
+    - name: Configure the Kubelet. Copy cert
+      copy:
+        src: "../ca.pem"
+        dest: /var/lib/kubernetes/
+        mode: 0744
+      become: true
+      tags:
+        - configure
+        - kubelet
+
+    - name: Configure the Kubernetes Proxy. Copy kubeconfig
+      copy:
+        src: "../kube-proxy.kubeconfig"
+        dest: /var/lib/kube-proxy/kubeconfig
+        mode: 0744
+      become: true
+      tags:
+        - configure
+        - kubeproxy
+
+    - name: Create systemd units
+      template:
+        src: "templates/{{ item }}.j2"
+        dest: "/etc/systemd/system/{{ item }}"
+        mode: 0744
+      become: true
+      with_items:
+        - kubelet.service
+        - kube-proxy.service
+      tags:
+        - service
+        - kubelet
+        - kubeproxy
+
+    - name: Start the Worker Services
+      systemd: 
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+        daemon_reload: yes
+      become: true
+      with_items:
+        - kubelet.service
+        - kube-proxy.service
+        - containerd
+        - cri-containerd
+      tags:
+        - service
+        - kubelet
+        - kubeproxy
