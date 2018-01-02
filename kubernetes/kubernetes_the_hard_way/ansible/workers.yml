@@ -98,15 +98,15 @@
         mode: 0744
       become: true
       with_items:
-        - "../{{ hostvars[inventory_hostname].gce_name }}.pem"
-        - "../{{ hostvars[inventory_hostname].gce_name }}-key.pem"
+        - "files/{{ hostvars[inventory_hostname].gce_name }}.pem"
+        - "files/{{ hostvars[inventory_hostname].gce_name }}-key.pem"
       tags:
         - configure
         - kubelet
 
     - name: Configure the Kubelet. Copy kubeconfig
       copy:
-        src: "../{{ hostvars[inventory_hostname].gce_name }}.kubeconfig"
+        src: "files/{{ hostvars[inventory_hostname].gce_name }}.kubeconfig"
         dest: /var/lib/kubelet/kubeconfig
         mode: 0744
       become: true
@@ -116,7 +116,7 @@
 
     - name: Configure the Kubelet. Copy cert
       copy:
-        src: "../ca.pem"
+        src: "files/ca.pem"
         dest: /var/lib/kubernetes/
         mode: 0744
       become: true
@@ -126,7 +126,7 @@
 
     - name: Configure the Kubernetes Proxy. Copy kubeconfig
       copy:
-        src: "../kube-proxy.kubeconfig"
+        src: "files/kube-proxy.kubeconfig"
         dest: /var/lib/kube-proxy/kubeconfig
         mode: 0744
       become: true

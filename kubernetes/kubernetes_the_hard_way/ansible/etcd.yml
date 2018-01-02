@@ -57,9 +57,9 @@
         owner: "{{ deploy_user }}"
         mode: 0744
       with_items:
-        - "../ca.pem"
-        - "../kubernetes.pem"
-        - "../kubernetes-key.pem"
+        - "files/ca.pem"
+        - "files/kubernetes.pem"
+        - "files/kubernetes-key.pem"
       become: true
       tags:
         - configure

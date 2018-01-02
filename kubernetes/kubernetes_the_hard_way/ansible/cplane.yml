@@ -39,11 +39,11 @@
         dest: /var/lib/kubernetes/
         mode: 0744
       with_items:
-        - "../ca.pem"
-        - "../ca-key.pem"
-        - "../kubernetes.pem"
-        - "../kubernetes-key.pem"
-        - "../encryption-config.yaml"
+        - "files/ca.pem"
+        - "files/ca-key.pem"
+        - "files/kubernetes.pem"
+        - "files/kubernetes-key.pem"
+        - "files/encryption-config.yaml"
       tags:
         - configure
 
