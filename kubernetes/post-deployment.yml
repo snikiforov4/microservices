@@ -21,3 +21,6 @@ spec:
       containers:
       - image: snikiforov4/post
         name: post
+        env:
+        - name: POST_DATABASE_HOST
+          value: post-db
