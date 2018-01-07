@@ -137,3 +137,11 @@ To run to new environment use the following command: `switch.py -e ENV_NAME`
 `default.env` contains properties shared for all environments and also props for __default__ environment. If -e ENV_NAME isn't specified default.env will be used.
 
 To deploy env use the following command: `deploy.py -e ENV_NAME`. If -e ENV_NAME isn't specified the script will try to get ENV_NAME from .env file ENV variable else error will occur.
+
+## Kubernetes
+
+
+### TLS
+Use openssl to generate key and certificate: `openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN={{ IP_OR_DOMAIN }}"`. To get ip use the following command: `kubectl get ingress/ui -n dev`.
+
+Replace variables in `ui-ingress-secret.yml.template` manualy or by running the script: `create_ui_ingress_secret.sh`(tls.key and tls.crt shoul be inside `ingress` directory). Generated `ui-ingress-secret.yml` file could be used to to create secret in k8s.
