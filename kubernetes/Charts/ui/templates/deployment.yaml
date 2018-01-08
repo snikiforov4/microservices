@@ -22,8 +22,12 @@ spec:
         release: {{ .Release.Name }}
     spec:
       containers:
-      - image: snikiforov4/ui
+      - image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         name: ui
+        ports:
+        - containerPort: {{ .Values.service.internalPort }}
+          name: ui
+          protocol: TCP
         env:
         - name: ENV
           valueFrom:
