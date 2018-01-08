@@ -1,9 +1,8 @@
 service:
   internalPort: 5000
   externalPort: 5000
-
 image:
   repository: snikiforov4/post
   tag: latest
-
 databaseHost:
+replicas: 3
