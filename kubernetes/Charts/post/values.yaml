@@ -2,7 +2,7 @@ service:
   internalPort: 5000
   externalPort: 5000
 
-age:
+image:
   repository: snikiforov4/post
   tag: latest
 

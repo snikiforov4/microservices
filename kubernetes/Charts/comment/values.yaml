@@ -2,7 +2,7 @@ service:
   internalPort: 9292
   externalPort: 9292
 
-age:
+image:
   repository: snikiforov4/comment
   tag: latest
 
