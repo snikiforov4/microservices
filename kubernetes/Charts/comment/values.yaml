@@ -1,0 +1,9 @@
+service:
+  internalPort: 9292
+  externalPort: 9292
+
+age:
+  repository: snikiforov4/comment
+  tag: latest
+
+databaseHost:
