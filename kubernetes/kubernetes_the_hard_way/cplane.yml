@@ -1,0 +1,74 @@
+- name: Bootstrapping the Kubernetes Control Plane
+  hosts: tag_controller
+  gather_facts: false
+  become: true
+  vars:
+    deploy_user: appuser
+
+  pre_tasks:
+    - name: Install python for Ansible
+      raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+      changed_when: false
+    - setup:
+       gather_subset: all
+
+  tasks:
+    - name: Download and Install the Kubernetes Controller Binaries
+      get_url:
+        url: "{{ item }}"
+        dest: /usr/local/bin/
+        mode: 0755
+      with_items:
+        - "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-apiserver"
+        - "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-controller-manager"
+        - "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-scheduler"
+        - "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl"
+      tags:
+        - install
+
+    - name: Create directory for k8s configs
+      file:
+        state: directory
+        path: /var/lib/kubernetes/
+      tags:
+        - configure
+
+    - name: Configure the Kubernetes API Server
+      copy:
+        src: "{{ item }}"
+        dest: /var/lib/kubernetes/
+        mode: 0744
+      with_items:
+        - "files/ca.pem"
+        - "files/ca-key.pem"
+        - "files/kubernetes.pem"
+        - "files/kubernetes-key.pem"
+        - "files/encryption-config.yaml"
+      tags:
+        - configure
+
+    - name: Create systemd units
+      template:
+        src: "templates/{{ item }}.j2"
+        dest: "/etc/systemd/system/{{ item }}"
+        mode: 0744
+      with_items:
+        - kube-apiserver.service
+        - kube-controller-manager.service
+        - kube-scheduler.service
+      tags:
+        - systemd
+      
+    - name: Start the Controller Services 
+      systemd: 
+        name: "{{ item }}"
+        state: restarted
+        enabled: yes
+        daemon_reload: yes
+      with_items:
+        - kube-apiserver.service
+        - kube-controller-manager.service
+        - kube-scheduler.service
+      tags:
+        - systemd
+
