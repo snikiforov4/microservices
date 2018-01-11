@@ -9,31 +9,11 @@
       "pluginName": "Prometheus"
     }
   ],
-  "__requires": [
-    {
-      "type": "grafana",
-      "id": "grafana",
-      "name": "Grafana",
-      "version": "4.6.1"
-    },
-    {
-      "type": "panel",
-      "id": "graph",
-      "name": "Graph",
-      "version": ""
-    },
-    {
-      "type": "datasource",
-      "id": "prometheus",
-      "name": "Prometheus",
-      "version": "1.0.0"
-    }
-  ],
   "annotations": {
     "list": [
       {
         "builtIn": 1,
-        "datasource": "-- Grafana --",
+        "datasource": "${DS_PROMETHEUS_SERVER}",
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
@@ -46,7 +26,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "hideControls": false,
-  "id": null,
+  "id": 4,
   "links": [],
   "refresh": "30s",
   "rows": [
@@ -87,7 +67,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "ui_request_count",
+              "expr": "ui_request_count{kubernetes_namespace=~\"$namespace\"}",
               "format": "time_series",
               "instant": false,
               "intervalFactor": 1,
@@ -175,7 +155,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(ui_request_count{http_status=~\"^[45].*\"}[5m])",
+              "expr": "rate(ui_request_count{http_status=~\"^[45].*\", kubernetes_namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "refId": "A"
@@ -261,7 +241,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "histogram_quantile(0.95, sum(rate(ui_request_latency_seconds_bucket[5m])) by (le))",
+              "expr": "histogram_quantile(0.95, sum(rate(ui_request_latency_seconds_bucket{kubernetes_namespace=~\"$namespace\"}[5m])) by (le))",
               "format": "time_series",
               "intervalFactor": 2,
               "refId": "A"
@@ -316,7 +296,34 @@
   "style": "dark",
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "allValue": null,
+        "current": {
+          "tags": [],
+          "text": "production",
+          "value": [
+            "production"
+          ]
+        },
+        "datasource": "Prometheus Server",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Env",
+        "multi": true,
+        "name": "namespace",
+        "options": [],
+        "query": "label_values(namespace)",
+        "refresh": 1,
+        "regex": "/.+/",
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      }
+    ]
   },
   "time": {
     "from": "now-5m",
@@ -349,5 +356,5 @@
   },
   "timezone": "",
   "title": "UI_Service_Monitoring",
-  "version": 3
+  "version": 1
 }
