@@ -811,13 +811,41 @@ serverFiles:
             action: replace
             target_label: kubernetes_pod_name
 
-      - job_name: 'reddit-endpoints'  
+      - job_name: 'reddit-post'  
         kubernetes_sd_configs:
           - role: endpoints
         relabel_configs:
-            - source_labels: [__meta_kubernetes_service_label_app]
+            - source_labels: [__meta_kubernetes_service_label_app, __meta_kubernetes_service_label_component]
               action: keep
-              regex: reddit
+              regex: reddit;post
+            - action: labelmap
+              regex: __meta_kubernetes_service_label_(.+)
+            - source_labels: [__meta_kubernetes_namespace]
+              target_label: kubernetes_namespace
+            - source_labels: [__meta_kubernetes_service_name]
+              target_label: kubernetes_name
+
+      - job_name: 'reddit-comment'  
+        kubernetes_sd_configs:
+          - role: endpoints
+        relabel_configs:
+            - source_labels: [__meta_kubernetes_service_label_app, __meta_kubernetes_service_label_component]
+              action: keep
+              regex: reddit;comment
+            - action: labelmap
+              regex: __meta_kubernetes_service_label_(.+)
+            - source_labels: [__meta_kubernetes_namespace]
+              target_label: kubernetes_namespace
+            - source_labels: [__meta_kubernetes_service_name]
+              target_label: kubernetes_name
+
+      - job_name: 'reddit-ui'
+        kubernetes_sd_configs:
+          - role: endpoints
+        relabel_configs:
+            - source_labels: [__meta_kubernetes_service_label_app, __meta_kubernetes_service_label_component]
+              action: keep
+              regex: reddit;ui
             - action: labelmap
               regex: __meta_kubernetes_service_label_(.+)
             - source_labels: [__meta_kubernetes_namespace]
