@@ -4,7 +4,7 @@ rbac:
 alertmanager:
   ## If false, alertmanager will not be installed
   ##
-  enabled: false
+  enabled: true
 
   # Defines the serviceAccountName to use when `rbac.create=false`
   serviceAccountName: default
@@ -576,21 +576,31 @@ alertmanagerFiles:
       # slack_api_url: ''
 
     receivers:
-      - name: default-receiver
-        # slack_configs:
-        #  - channel: '@you'
-        #    send_resolved: true
+      - name: 'slack-notifications'
+        slack_configs:
+          - channel: '#sergey-nikiforov'
+            api_url: 'https://hooks.slack.com/services/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'
+            send_resolved: true
 
     route:
-      group_wait: 10s
-      group_interval: 5m
-      receiver: default-receiver
-      repeat_interval: 3h
+      receiver: 'slack-notifications'
 
 ## Prometheus server ConfigMap entries
 ##
 serverFiles:
-  alerts: {}
+  alerts: 
+    groups:
+    - name: Critical
+      rules:
+
+      # Alert for any instance that is unreachable for >1 minutes.
+      - alert: InstanceDown
+        expr: up == 0
+        for: 1m
+        annotations:
+          summary: "Instance {{ $labels.instance }} down"
+          description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes."
+
   rules: {}
 
   prometheus.yml:
