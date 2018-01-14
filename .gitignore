@@ -9,3 +9,8 @@ build_info.txt
 gce.ini
 
 *.retry
+
+# k8s
+tls.key
+tls.crt
+ui-ingress-secret.yml
