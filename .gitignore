@@ -16,4 +16,4 @@ tls.crt
 ui-ingress-secret.yml
 # Charts
 requirements.lock
-**/reddit/charts/
+*.tgz
