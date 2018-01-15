@@ -1,0 +1,13 @@
+service:
+  internalPort: 9292
+  externalPort: 9292
+image:
+  repository: snikiforov4/ui
+  tag: latest
+replicas: 3
+postHost:
+postPort:
+commentHost:
+commentPort:
+ingress:
+  class: nginx

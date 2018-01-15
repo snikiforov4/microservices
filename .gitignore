@@ -14,3 +14,6 @@ gce.ini
 tls.key
 tls.crt
 ui-ingress-secret.yml
+# Charts
+requirements.lock
+*.tgz

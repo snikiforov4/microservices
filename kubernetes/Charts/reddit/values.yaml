@@ -1,0 +1,6 @@
+comment:
+  replicas: 2
+post:
+  replicas: 2
+ui:
+  replicas: 2
