@@ -593,13 +593,21 @@ serverFiles:
     - name: Critical
       rules:
 
-      # Alert for any instance that is unreachable for >1 minutes.
-      - alert: InstanceDown
-        expr: up == 0
+      # Alert for any k8s node that is unreachable for >1 minutes.
+      - alert: NodeDown
+        expr: up{job="kubernetes-nodes"} == 0
         for: 1m
         annotations:
-          summary: "Instance {{ $labels.instance }} down"
-          description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes."
+          summary: "Node {{ $labels.instance }} down"
+          description: "Node {{ $labels.instance }} has been down for more than 1 minutes."
+
+      # Alert k8s apiservers that is unreachable for >1 minutes.
+      - alert: K8sApiserverDown
+        expr: up{job="kubernetes-apiservers"} == 0
+        for: 1m
+        annotations:
+          summary: "K8S Apiserver {{ $labels.instance }} down"
+          description: "K8S Apiserver is unreachable on {{ $labels.instance }} for more than 1 minutes."
 
   rules: {}
 
